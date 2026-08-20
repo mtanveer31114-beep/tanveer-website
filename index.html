@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Muhammad Tanveer | Islamic Video Editor</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        cinematic: ['Cinzel', 'serif'],
+                    },
+                    colors: {
+                        brand: {
+                            obsidian: '#0A0F1D',
+                            emerald: '#064E3B',
+                            emeraldlite: '#059669',
+                            warmgold: '#D97706',
+                            softgold: '#F59E0B',
+                            crispwhite: '#F8FAFC'
+                        }
+                    },
+                    boxShadow: {
+                        'glow-emerald': '0 0 20px rgba(6, 78, 59, 0.6)',
+                        'glow-gold': '0 0 20px rgba(217, 119, 6, 0.6)',
+                        'glow-mixed': '0 0 25px rgba(217, 119, 6, 0.4), 0 0 25px rgba(6, 78, 59, 0.4)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #0A0F1D;
+            color: #F8FAFC;
+            overflow-x: hidden;
+            cursor: auto !important;
+        }
+
+        *, *::before, *::after {
+            cursor: auto !important;
+        }
+
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0A0F1D;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #064E3B;
+            border-radius: 5px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #D97706;
+        }
+
+        .islamic-pattern-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -2;
+            opacity: 0.03;
+            background-color: #0A0F1D;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Cg fill='none' stroke='%23D97706' stroke-width='1'%3E%3Cpath d='M40 0L80 40L40 80L0 40z'/%3E%3Cpath d='M0 0H80V80H0z'/%3E%3Cpath d='M20 0L80 60M0 20L60 80M60 0L0 60M80 20L20 80'/%3E%3C/g%3E%3C/svg%3E");
+            background-size: 100px 100px;
+        }
+
+        .glass {
+            background: rgba(10, 15, 29, 0.6);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .perspective-1000 {
+            perspective: 1000px;
+        }
+        
+        .transform-3d {
+            transform-style: preserve-3d;
+            transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.4s ease;
+        }
+
+        .hover-3d-card:hover {
+            transform: translateY(-10px) rotateX(5deg) rotateY(2deg);
+            box-shadow: 0 15px 35px rgba(217, 119, 6, 0.2), 0 5px 15px rgba(6, 78, 59, 0.4);
+            border-color: #D97706;
+        }
+
+        .js-tilt {
+            transform-style: preserve-3d;
+            will-change: transform;
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px) scale(0.95);
+            transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        .text-gradient {
+            background: linear-gradient(135deg, #F59E0B, #D97706, #059669);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .upload-overlay {
+            background: linear-gradient(to top, rgba(10,15,29,0.9), rgba(6,78,59,0.4));
+        }
+
+        :root {
+            --mouse-x: 0;
+            --mouse-y: 0;
+            --scroll-y: 0;
+        }
+        
+        @keyframes pulse-glow {
+            0%, 100% { opacity: 0.15; transform: scale(1) translate(0, 0); }
+            50% { opacity: 0.35; transform: scale(1.1) translate(2%, 2%); }
+        }
+        
+        .ambient-flare {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(120px);
+            z-index: -3;
+            pointer-events: none;
+            mix-blend-mode: screen;
+            animation: pulse-glow 10s ease-in-out infinite alternate;
+            will-change: transform, opacity;
+        }
+        
+        .flare-emerald { top: -15%; left: -10%; width: 60vw; height: 60vw; background: rgba(6, 78, 59, 1); animation-delay: 0s; }
+        .flare-gold { bottom: -10%; right: -15%; width: 60vw; height: 60vw; background: rgba(217, 119, 6, 1); animation-delay: -5s; }
+
+        .parallax-bg {
+            transform: translate3d(calc(var(--mouse-x) * -25px), calc(var(--mouse-y) * -25px + var(--scroll-y) * 0.3px), -100px);
+            will-change: transform;
+        }
+        
+        .parallax-canvas {
+            transform: translate3d(calc(var(--mouse-x) * 15px), calc(var(--mouse-y) * 15px + var(--scroll-y) * 0.15px), 0);
+            will-change: transform;
+        }
+
+        .bg-base {
+            background: radial-gradient(circle at center, #111827 0%, #0A0F1D 100%);
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-brand-warmgold selection:text-white bg-base relative overflow-x-hidden">
+
+    <div class="ambient-flare flare-emerald"></div>
+    <div class="ambient-flare flare-gold"></div>
+
+    <div class="islamic-pattern-bg parallax-bg"></div>
+    <canvas id="particleCanvas" class="fixed inset-0 pointer-events-none z-[-1] opacity-70 parallax-canvas"></canvas>
+
+    <!-- Navigation -->
+    <nav id="navbar" class="glass fixed w-full top-0 z-50 transition-all duration-300 border-b border-white/5">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <div class="flex-shrink-0 flex items-center cursor-pointer group" onclick="window.scrollTo(0,0)">
+                    <span class="text-xl md:text-2xl font-cinematic font-bold tracking-wider text-brand-crispwhite flex items-center gap-2">
+                        <i class="fas fa-moon text-brand-warmgold group-hover:rotate-[360deg] transition-transform duration-1000"></i>
+                        MUHAMMAD <span class="text-brand-warmgold">TANVEER</span>
+                    </span>
+                </div>
+                
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#home" class="text-sm uppercase tracking-widest text-gray-300 hover:text-brand-warmgold font-medium transition-colors duration-300 relative group">
+                        Home
+                        <span class="absolute -bottom-2 left-0 w-0 h-0.5 bg-brand-warmgold transition-all duration-300 group-hover:w-full"></span>
+                    </a>
+                    <a href="#portfolio" class="text-sm uppercase tracking-widest text-gray-300 hover:text-brand-warmgold font-medium transition-colors duration-300 relative group">
+                        Portfolio
+                        <span class="absolute -bottom-2 left-0 w-0 h-0.5 bg-brand-warmgold transition-all duration-300 group-hover:w-full"></span>
+                    </a>
+                    <a href="#services" class="text-sm uppercase tracking-widest text-gray-300 hover:text-brand-warmgold font-medium transition-colors duration-300 relative group">
+                        Services
+                        <span class="absolute -bottom-2 left-0 w-0 h-0.5 bg-brand-warmgold transition-all duration-300 group-hover:w-full"></span>
+                    </a>
+                    <div class="flex items-center">
+                        <a href="https://wa.me/923471531114" target="_blank" class="px-6 py-2.5 bg-gradient-to-r from-brand-emerald to-brand-emeraldlite hover:from-brand-warmgold hover:to-brand-softgold text-white rounded-md font-semibold tracking-wide transition-all duration-500 shadow-glow-emerald hover:shadow-glow-gold relative overflow-hidden group">
+                            <span class="relative z-10">Hire Me</span>
+                            <div class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out"></div>
+                        </a>
+                        <a href="https://mail.google.com/mail/?view=cm&fs=1&to=mtanveer31114@gmail.com" target="_blank" style="position: relative; z-index: 50; pointer-events: auto; cursor: pointer !important;" class="inline-flex items-center justify-center gap-2 px-6 py-2.5 ml-4 bg-brand-obsidian/60 border border-brand-warmgold text-brand-warmgold hover:bg-brand-warmgold hover:text-brand-obsidian rounded-md font-medium tracking-wide transition-all duration-300 shadow-glow-gold">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                            Hire on Email
+                        </a>
+                    </div>
+                </div>
+
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-btn" class="text-gray-300 hover:text-brand-warmgold focus:outline-none p-2 transition-colors">
+                        <i class="fas fa-bars text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="mobile-menu" class="hidden md:hidden glass border-b border-gray-800 absolute w-full">
+            <div class="px-4 pt-2 pb-6 space-y-2">
+                <a href="#home" class="block px-3 py-3 text-base uppercase tracking-wider font-medium text-gray-300 hover:text-brand-warmgold hover:bg-white/5 rounded-md transition-colors">Home</a>
+                <a href="#portfolio" class="block px-3 py-3 text-base uppercase tracking-wider font-medium text-gray-300 hover:text-brand-warmgold hover:bg-white/5 rounded-md transition-colors">Portfolio</a>
+                <a href="#services" class="block px-3 py-3 text-base uppercase tracking-wider font-medium text-gray-300 hover:text-brand-warmgold hover:bg-white/5 rounded-md transition-colors">Services</a>
+                <a href="#contact" class="block px-3 py-3 text-base uppercase tracking-wider font-medium text-gray-300 hover:text-brand-warmgold hover:bg-white/5 rounded-md transition-colors">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="relative min-h-screen flex items-center pt-24 pb-12 z-10 perspective-1000">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+            <div class="flex flex-col-reverse lg:flex-row items-center gap-16 lg:gap-8">
+                
+                <div class="w-full lg:w-3/5 text-center lg:text-left z-10 reveal">
+                    <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass border border-brand-warmgold/30 bg-brand-warmgold/10 text-brand-softgold text-xs sm:text-sm font-medium tracking-widest uppercase mb-6 shadow-glow-gold backdrop-blur-md">
+                        <i class="fas fa-sparkles text-brand-warmgold animate-pulse"></i>
+                        <span>Creative Studio & Post-Production</span>
+                    </div>
+                    
+                    <h1 class="text-3xl sm:text-5xl md:text-6xl lg:text-[3.25rem] font-cinematic font-bold text-white leading-[1.2] tracking-wide mb-6 drop-shadow-2xl">
+                        PROFESSIONAL ISLAMIC <span class="bg-gradient-to-r from-brand-warmgold via-amber-200 to-brand-softgold bg-clip-text text-transparent drop-shadow-[0_0_30px_rgba(217,119,6,0.4)]">VIDEO EDITOR</span> <span class="block mt-2 bg-gradient-to-r from-brand-crispwhite via-brand-softgold to-brand-emerald bg-clip-text text-transparent">& AI VISUAL EFFECTS ARTIST</span>
+                    </h1>
+                    
+                    <p class="text-lg md:text-xl text-gray-300 mb-10 max-w-2xl mx-auto lg:mx-0 leading-relaxed font-light tracking-wide">
+                        Creating engaging Quran recitations, Hadith clips, scholar podcasts, and powerful Islamic Bayanat.
+                    </p>
+                    <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-5 flex-wrap">
+                        <a href="#portfolio" class="w-full sm:w-auto px-8 py-4 bg-brand-emerald hover:bg-brand-emeraldlite text-white rounded-md font-semibold tracking-wide transition-all duration-300 flex items-center justify-center gap-3 shadow-glow-emerald hover:-translate-y-1">
+                            <i class="fas fa-play"></i> Explore Works
+                        </a>
+                        <a href="https://wa.me/923471531114" target="_blank" class="w-full sm:w-auto px-8 py-4 bg-transparent border border-brand-warmgold text-brand-warmgold hover:bg-brand-warmgold hover:text-brand-obsidian rounded-md font-semibold tracking-wide transition-all duration-300 flex items-center justify-center gap-3 hover:shadow-glow-gold hover:-translate-y-1 relative z-50 cursor-pointer">
+                            <i class="fab fa-whatsapp text-xl"></i> Hire on WhatsApp
+                        </a>
+                        <a href="https://mail.google.com/mail/?view=cm&fs=1&to=mtanveer31114@gmail.com" target="_blank" style="position: relative; z-index: 50; pointer-events: auto; cursor: pointer !important;" class="w-full sm:w-auto px-8 py-4 bg-brand-obsidian/60 border border-brand-warmgold text-brand-warmgold hover:bg-brand-warmgold hover:text-brand-obsidian rounded-md font-semibold tracking-wide transition-all duration-300 flex items-center justify-center gap-3 shadow-glow-gold hover:-translate-y-1">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                            Hire via Email
+                        </a>
+                    </div>
+                </div>
+
+                <div class="w-full lg:w-2/5 flex justify-center z-10 perspective-1000 reveal" style="transition-delay: 0.2s;">
+                    <div id="hero-card" class="js-tilt relative w-72 h-96 sm:w-80 sm:h-[450px] rounded-2xl p-1 bg-gradient-to-br from-brand-emerald via-brand-obsidian to-brand-warmgold shadow-glow-mixed cursor-pointer group">
+                        <div class="absolute inset-1 bg-brand-obsidian rounded-xl overflow-hidden flex flex-col items-center justify-center z-10" onclick="document.getElementById('profileUpload').click()">
+                            <div id="profile-placeholder" class="flex flex-col items-center text-center p-6 space-y-4 transition-opacity duration-300">
+                                <div class="w-20 h-20 rounded-full border-2 border-brand-warmgold border-dashed flex items-center justify-center text-brand-warmgold text-3xl group-hover:rotate-12 transition-transform duration-500 shadow-[0_0_15px_rgba(217,119,6,0.3)]">
+                                    <i class="fas fa-camera-retro"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-white font-cinematic font-bold text-xl mb-2 tracking-wide">Identity</h3>
+                                    <p class="text-sm text-gray-400 font-light">📸 Click to Upload Profile Picture</p>
+                                </div>
+                            </div>
+                            <img src="profile.jpg" alt="Profile" class="absolute inset-0 w-full h-full object-cover z-20">
+                            <div id="profile-overlay" class="upload-overlay absolute inset-0 hidden z-30 flex-col items-center justify-end pb-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                <div class="bg-brand-obsidian/80 backdrop-blur-md px-4 py-2 rounded-full border border-brand-warmgold/50 flex items-center gap-2 text-brand-warmgold text-sm font-medium">
+                                    <i class="fas fa-pen"></i> Update Photo
+                                </div>
+                            </div>
+                        </div>
+                        <input type="file" id="profileUpload" accept="image/*" class="hidden" onchange="handleImageUpload(event)">
+                        <div class="absolute -top-4 -right-4 text-brand-warmgold text-4xl opacity-50 transform translate-z-10 group-hover:rotate-45 transition-transform duration-700">
+                            <i class="fas fa-star-and-crescent"></i>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Portfolio Section -->
+    <section id="portfolio" class="py-24 relative z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 reveal">
+                <span class="text-brand-emerald font-semibold tracking-[0.2em] uppercase text-xs border border-brand-emerald/30 px-3 py-1 rounded-full bg-brand-emerald/10">Chapter II</span>
+                <h2 class="text-4xl md:text-5xl font-cinematic font-bold text-white mt-4 mb-4 drop-shadow-lg">Featured Visual Works</h2>
+                <div class="w-24 h-1 bg-gradient-to-r from-brand-emerald to-brand-warmgold mx-auto rounded-full"></div>
+            </div>
+
+            <!-- Filters -->
+            <div class="flex flex-wrap justify-center gap-3 mb-12 reveal" style="transition-delay: 0.1s;">
+                <button class="filter-btn active px-5 py-2 rounded-full border border-brand-warmgold bg-brand-warmgold text-brand-obsidian font-medium text-sm tracking-wide transition-all" data-filter="all">All</button>
+                <button class="filter-btn px-5 py-2 rounded-full border border-gray-700 bg-transparent text-gray-300 hover:border-brand-emerald hover:text-brand-emeraldlite font-medium text-sm tracking-wide transition-all" data-filter="quran">Quran Recitations</button>
+                <button class="filter-btn px-5 py-2 rounded-full border border-gray-700 bg-transparent text-gray-300 hover:border-brand-emerald hover:text-brand-emeraldlite font-medium text-sm tracking-wide transition-all" data-filter="podcasts">Podcasts & Lectures</button>
+                <button class="filter-btn px-5 py-2 rounded-full border border-gray-700 bg-transparent text-gray-300 hover:border-brand-emerald hover:text-brand-emeraldlite font-medium text-sm tracking-wide transition-all" data-filter="shorts">Shorts & Reels</button>
+                <button class="filter-btn px-5 py-2 rounded-full border border-gray-700 bg-transparent text-gray-300 hover:border-brand-emerald hover:text-brand-emeraldlite font-medium text-sm tracking-wide transition-all" data-filter="thumbnails">Thumbnails</button>
+            </div>
+
+            <!-- Portfolio Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8 perspective-1000">
+                
+                <!-- Item 1: Quran -->
+                <div class="portfolio-item transform-3d hover-3d-card glass rounded-xl border border-white/10 overflow-hidden reveal group relative h-[400px]" data-category="quran">
+                    <div class="absolute inset-0 bg-[url('ikhlas-thumb.jpg')] bg-cover bg-center opacity-40 group-hover:opacity-70 transition-opacity duration-500"></div>
+                    <div class="absolute inset-0 bg-gradient-to-t from-brand-obsidian via-brand-obsidian/60 to-transparent"></div>
+                    <div class="absolute bottom-0 w-full p-8 z-10 transform translate-z-20">
+                        <span class="text-brand-warmgold text-xs font-bold tracking-widest uppercase mb-2 block"><i class="fas fa-book-open mr-2"></i>Quran Recitation</span>
+                        <h3 class="text-2xl font-cinematic font-bold text-white mb-2">Surah Al-Ikhlas</h3>
+                        <p class="text-gray-300 text-sm font-light mb-4">Cinematic 4K visuals, atmospheric color grading, and multi-language synchronous subtitles.</p>
+                        <a href="ikhlas.mp4" target="_blank" class="w-12 h-12 rounded-full bg-brand-emerald flex items-center justify-center text-white hover:bg-brand-warmgold transition-colors shadow-lg group-hover:scale-110">
+                            <i class="fas fa-play ml-1"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Item 2: Lecture -->
+                <div class="portfolio-item transform-3d hover-3d-card glass rounded-xl border border-white/10 overflow-hidden reveal group relative h-[400px]" data-category="podcasts" style="transition-delay: 0.1s;">
+                    <div class="absolute inset-0 bg-[url('reminder-thumb.jpg')] bg-cover bg-center opacity-40 group-hover:opacity-70 transition-opacity duration-500"></div>
+                    <div class="absolute inset-0 bg-gradient-to-t from-brand-obsidian via-brand-obsidian/60 to-transparent"></div>
+                    <div class="absolute bottom-0 w-full p-8 z-10">
+                        <span class="text-brand-emerald text-xs font-bold tracking-widest uppercase mb-2 block"><i class="fas fa-microphone-alt mr-2"></i>Podcast</span>
+                        <h3 class="text-2xl font-cinematic font-bold text-white mb-2">Emotional Reminders</h3>
+                        <p class="text-gray-300 text-sm font-light mb-4">Multi-cam layout switching, background noise reduction, and custom animated lower thirds.</p>
+                        <a href="reminder.mp4" target="_blank" class="w-12 h-12 rounded-full bg-brand-warmgold flex items-center justify-center text-brand-obsidian hover:bg-white transition-colors shadow-lg group-hover:scale-110">
+                            <i class="fas fa-play ml-1"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Item 3: Shorts - Card 1 -->
+                <div class="portfolio-item transform-3d hover-3d-card glass rounded-xl border border-white/10 overflow-hidden reveal group relative h-[400px]" data-category="shorts" style="transition-delay: 0.2s;">
+                    <div class="absolute inset-0 bg-[url('nisa-thumb.jpg')] bg-cover bg-center opacity-40 group-hover:opacity-70 transition-opacity duration-500"></div>
+                    <div class="absolute inset-0 bg-gradient-to-t from-brand-obsidian via-brand-obsidian/60 to-transparent"></div>
+                    <div class="absolute bottom-0 w-full p-8 z-10">
+                        <span class="text-brand-softgold text-xs font-bold tracking-widest uppercase mb-2 block"><i class="fas fa-mobile-alt mr-2"></i>Vertical Video</span>
+                        <h3 class="text-2xl font-cinematic font-bold text-white mb-2">Surah An-Nisa 174-175</h3>
+                        <p class="text-gray-300 text-sm font-light mb-4">Dynamic typography, fast-paced cuts, and engaging visual hooks designed for maximum retention.</p>
+                        <a href="nisa.mp4" target="_blank" class="w-12 h-12 rounded-full bg-brand-emerald flex items-center justify-center text-white hover:bg-brand-warmgold transition-colors shadow-lg group-hover:scale-110">
+                            <i class="fas fa-play ml-1"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Item 4: Shorts - Card 2 -->
+                <div class="portfolio-item transform-3d hover-3d-card glass rounded-xl border border-white/10 overflow-hidden reveal group relative h-[400px]" data-category="shorts" style="transition-delay: 0.3s;">
+                    <div class="absolute inset-0 bg-[url('furqan-thumb.jpg')] bg-cover bg-center opacity-40 group-hover:opacity-70 transition-opacity duration-500"></div>
+                    <div class="absolute inset-0 bg-gradient-to-t from-brand-obsidian via-brand-obsidian/60 to-transparent"></div>
+                    <div class="absolute bottom-0 w-full p-8 z-10">
+                        <span class="text-brand-softgold text-xs font-bold tracking-widest uppercase mb-2 block"><i class="fas fa-mobile-alt mr-2"></i>Vertical Video</span>
+                        <h3 class="text-2xl font-cinematic font-bold text-white mb-2">Surah Al-Furqan 70-71</h3>
+                        <p class="text-gray-300 text-sm font-light mb-4">Dynamic typography, fast-paced cuts, and engaging visual hooks designed for maximum retention.</p>
+                        <a href="furqan.mp4" target="_blank" class="w-12 h-12 rounded-full bg-brand-emerald flex items-center justify-center text-white hover:bg-brand-warmgold transition-colors shadow-lg group-hover:scale-110">
+                            <i class="fas fa-play ml-1"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Item 5: Shorts - Card 3 -->
+                <div class="portfolio-item transform-3d hover-3d-card glass rounded-xl border border-white/10 overflow-hidden reveal group relative h-[400px]" data-category="shorts" style="transition-delay: 0.4s;">
+                    <div class="absolute inset-0 bg-[url('arafat-thumb.jpg')] bg-cover bg-center opacity-40 group-hover:opacity-70 transition-opacity duration-500"></div>
+                    <div class="absolute inset-0 bg-gradient-to-t from-brand-obsidian via-brand-obsidian/60 to-transparent"></div>
+                    <div class="absolute bottom-0 w-full p-8 z-10">
+                        <span class="text-brand-softgold text-xs font-bold tracking-widest uppercase mb-2 block"><i class="fas fa-mobile-alt mr-2"></i>Vertical Video</span>
+                        <h3 class="text-2xl font-cinematic font-bold text-white mb-2">Ila Arafatin Nasheed</h3>
+                        <p class="text-gray-300 text-sm font-light mb-4">Dynamic typography, fast-paced cuts, and engaging visual hooks designed for maximum retention.</p>
+                        <a href="arafat.mp4" target="_blank" class="w-12 h-12 rounded-full bg-brand-emerald flex items-center justify-center text-white hover:bg-brand-warmgold transition-colors shadow-lg group-hover:scale-110">
+                            <i class="fas fa-play ml-1"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Item 6: Custom Thumbnails Showcase -->
+                <div class="portfolio-item transform-3d hover-3d-card glass rounded-xl border border-white/10 overflow-hidden reveal group relative h-[400px]" data-category="thumbnails" style="transition-delay: 0.5s;">
+                    <div class="absolute inset-0 grid grid-cols-2 grid-rows-2 opacity-40 group-hover:opacity-70 transition-opacity duration-500">
+                        <div class="bg-[url('yasin-thumb.jpg')] bg-cover bg-center"></div>
+                        <div class="bg-[url('rahman-thumb.jpg')] bg-cover bg-center"></div>
+                        <div class="bg-[url('dua-thumb.jpg')] bg-cover bg-center"></div>
+                        <div class="bg-[url('kahf-thumb.jpg')] bg-cover bg-center"></div>
+                    </div>
+                    <div class="absolute inset-0 bg-gradient-to-t from-brand-obsidian via-brand-obsidian/70 to-transparent"></div>
+                    <div class="absolute bottom-0 w-full p-8 z-10">
+                        <span class="text-brand-warmgold text-xs font-bold tracking-widest uppercase mb-2 block"><i class="fas fa-image mr-2"></i>Design Art</span>
+                        <h3 class="text-2xl font-cinematic font-bold text-white mb-2">Custom Thumbnails</h3>
+                        <p class="text-gray-300 text-sm font-light mb-4">High-contrast, story-driven YouTube thumbnail designs engineered to maximize click-through rates (CTR).</p>
+                        <div class="flex items-center gap-3">
+                            <a href="yasin-thumb.jpg" target="_blank" class="w-10 h-10 rounded-full bg-brand-emerald flex items-center justify-center text-white hover:bg-brand-warmgold transition-colors shadow-lg group-hover:scale-105" title="View Yasin Thumb">
+                                <i class="fas fa-eye text-xs"></i>
+                            </a>
+                            <a href="rahman-thumb.jpg" target="_blank" class="w-10 h-10 rounded-full bg-brand-emerald flex items-center justify-center text-white hover:bg-brand-warmgold transition-colors shadow-lg group-hover:scale-105" title="View Rahman Thumb">
+                                <i class="fas fa-eye text-xs"></i>
+                            </a>
+                            <a href="dua-thumb.jpg" target="_blank" class="w-10 h-10 rounded-full bg-brand-emerald flex items-center justify-center text-white hover:bg-brand-warmgold transition-colors shadow-lg group-hover:scale-110" title="View Dua Thumb">
+                                <i class="fas fa-eye text-xs"></i>
+                            </a>
+                            <a href="kahf-thumb.jpg" target="_blank" class="w-10 h-10 rounded-full bg-brand-emerald flex items-center justify-center text-white hover:bg-brand-warmgold transition-colors shadow-lg group-hover:scale-110" title="View Kahf Thumb">
+                                <i class="fas fa-eye text-xs"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services" class="py-24 relative z-10 bg-black/40 border-y border-white/5">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 reveal">
+                <span class="text-brand-warmgold font-semibold tracking-[0.2em] uppercase text-xs border border-brand-warmgold/30 px-3 py-1 rounded-full bg-brand-warmgold/10">Chapter III</span>
+                <h2 class="text-4xl md:text-5xl font-cinematic font-bold text-white mt-4 mb-4 drop-shadow-lg">Editorial Solutions</h2>
+                <p class="text-gray-400 max-w-2xl mx-auto font-light">Elevating Dawah through meticulous attention to detail, spiritual aesthetic awareness, and modern production standards.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 perspective-1000">
+                
+                <div class="transform-3d hover-3d-card glass p-8 rounded-2xl border border-white/5 flex gap-6 group reveal">
+                    <div class="flex-shrink-0 w-16 h-16 rounded-xl bg-gradient-to-br from-brand-emerald to-brand-obsidian border border-brand-emerald/50 flex items-center justify-center text-brand-crispwhite text-2xl shadow-glow-emerald group-hover:scale-110 transition-transform duration-300">
+                        <i class="fas fa-quran"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-cinematic font-bold text-white mb-3 group-hover:text-brand-emerald transition-colors">Complete Quran Production</h3>
+                        <p class="text-gray-400 text-sm leading-relaxed font-light">Audio mastering of raw recitations, synchronous multi-lingual typography, and cinematic nature B-roll integration with deep color grading.</p>
+                    </div>
+                </div>
+
+                <div class="transform-3d hover-3d-card glass p-8 rounded-2xl border border-white/5 flex gap-6 group reveal" style="transition-delay: 0.1s;">
+                    <div class="flex-shrink-0 w-16 h-16 rounded-xl bg-gradient-to-br from-brand-warmgold to-brand-obsidian border border-brand-warmgold/50 flex items-center justify-center text-brand-crispwhite text-2xl shadow-glow-gold group-hover:scale-110 transition-transform duration-300">
+                        <i class="fas fa-headphones-alt"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-cinematic font-bold text-white mb-3 group-hover:text-brand-warmgold transition-colors">Podcast & Lecture Editing</h3>
+                        <p class="text-gray-400 text-sm leading-relaxed font-light">Dynamic multi-camera switching, professional audio denoise, dead-space removal, and custom branded lower thirds for speakers.</p>
+                    </div>
+                </div>
+
+                <div class="transform-3d hover-3d-card glass p-8 rounded-2xl border border-white/5 flex gap-6 group reveal" style="transition-delay: 0.2s;">
+                    <div class="flex-shrink-0 w-16 h-16 rounded-xl bg-gradient-to-br from-brand-emerald to-brand-obsidian border border-brand-emerald/50 flex items-center justify-center text-brand-crispwhite text-2xl shadow-glow-emerald group-hover:scale-110 transition-transform duration-300">
+                        <i class="fas fa-fire"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-cinematic font-bold text-white mb-3 group-hover:text-brand-emerald transition-colors">Social Media Optimization</h3>
+                        <p class="text-gray-400 text-sm leading-relaxed font-light">Repurposing long-form content into viral TikToks, IG Reels, and YT Shorts with engaging captions and sound effects.</p>
+                    </div>
+                </div>
+
+                <div class="transform-3d hover-3d-card glass p-8 rounded-2xl border border-white/5 flex gap-6 group reveal" style="transition-delay: 0.3s;">
+                    <div class="flex-shrink-0 w-16 h-16 rounded-xl bg-gradient-to-br from-brand-warmgold to-brand-obsidian border border-brand-warmgold/50 flex items-center justify-center text-brand-crispwhite text-2xl shadow-glow-gold group-hover:scale-110 transition-transform duration-300">
+                        <i class="fas fa-crop-alt"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-cinematic font-bold text-white mb-3 group-hover:text-brand-warmgold transition-colors">Thumbnail & Branding</h3>
+                        <p class="text-gray-400 text-sm leading-relaxed font-light">Designing visually striking, high-contrast YouTube thumbnails that tell a story and significantly increase your video Click-Through-Rate (CTR).</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-24 relative z-10">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center reveal">
+            <div class="inline-flex items-center justify-center w-20 h-20 rounded-full border border-brand-warmgold/20 bg-brand-warmgold/10 text-brand-warmgold mb-8 shadow-glow-gold relative overflow-hidden group">
+                <div class="absolute inset-0 bg-brand-warmgold/20 group-hover:scale-150 transition-transform duration-700 rounded-full"></div>
+                <i class="fas fa-paper-plane text-3xl relative z-10 group-hover:-translate-y-1 transition-transform"></i>
+            </div>
+            <h2 class="text-4xl md:text-5xl font-cinematic font-bold text-white mb-6">Let's Create Something Profound</h2>
+            <p class="text-gray-400 text-lg mb-10 max-w-2xl mx-auto font-light">
+                Ready to elevate your Islamic content and spread the message beautifully? Drop me a message to discuss your vision, workflow, and requirements.
+            </p>
+            
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4 flex-wrap">
+                <a href="https://wa.me/923471531114" target="_blank" class="inline-flex items-center justify-center gap-4 px-10 py-5 bg-gradient-to-r from-brand-emerald to-brand-emeraldlite hover:from-brand-warmgold hover:to-brand-softgold text-white rounded-full font-bold text-lg tracking-wide transition-all duration-500 shadow-glow-emerald hover:shadow-glow-gold hover:-translate-y-2 group relative z-50 cursor-pointer">
+                    <i class="fab fa-whatsapp text-3xl group-hover:rotate-12 transition-transform"></i> 
+                    Start a Conversation
+                </a>
+                <a href="https://mail.google.com/mail/?view=cm&fs=1&to=mtanveer31114@gmail.com" target="_blank" style="position: relative; z-index: 50; pointer-events: auto; cursor: pointer !important;" class="inline-flex items-center justify-center gap-4 px-10 py-5 bg-brand-obsidian/60 border border-brand-warmgold text-brand-warmgold hover:bg-brand-warmgold hover:text-brand-obsidian rounded-full font-bold text-lg tracking-wide transition-all duration-500 shadow-glow-gold hover:-translate-y-2 group">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                    Hire via Email
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Floating WhatsApp Button -->
+    <a href="https://wa.me/923471531114" target="_blank" class="fixed bottom-8 right-8 bg-[#25D366] text-white w-16 h-16 rounded-full flex items-center justify-center text-4xl shadow-[0_0_20px_rgba(37,211,102,0.5)] hover:shadow-[0_0_30px_rgba(37,211,102,0.8)] transition-all duration-300 z-[100] group hover:-translate-y-2" aria-label="Chat on WhatsApp">
+        <i class="fab fa-whatsapp"></i>
+        <span class="absolute inline-flex h-full w-full rounded-full bg-[#25D366] opacity-30 animate-ping -z-10"></span>
+        <span class="absolute right-20 bg-brand-obsidian text-white text-sm py-2 px-4 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none whitespace-nowrap border border-white/10 shadow-xl font-medium tracking-wide">
+            Chat with me
+        </span>
+    </a>
+
+    <footer class="bg-black/60 py-10 border-t border-white/5 relative z-10">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <p class="text-gray-400 font-light tracking-wide">
+                &copy; <span id="year"></span> <span class="text-brand-warmgold font-cinematic font-bold">Muhammad Tanveer</span>. All Rights Reserved.
+            </p>
+            <p class="text-gray-600 text-xs mt-3 uppercase tracking-[0.2em]">
+                Crafted with dedication for the Ummah.
+            </p>
+        </div>
+    </footer>
+
+    <!-- JavaScript Interactions -->
+    <script>
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        const btn = document.getElementById('mobile-menu-btn');
+        const menu = document.getElementById('mobile-menu');
+        const icon = btn.querySelector('i');
+
+        btn.addEventListener('click', () => {
+            menu.classList.toggle('hidden');
+            if(menu.classList.contains('hidden')){
+                icon.classList.replace('fa-times', 'fa-bars');
+            } else {
+                icon.classList.replace('fa-bars', 'fa-times');
+            }
+        });
+
+        const mobileLinks = menu.querySelectorAll('a');
+        mobileLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                menu.classList.add('hidden');
+                icon.classList.replace('fa-times', 'fa-bars');
+            });
+        });
+
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                nav.classList.add('bg-opacity-90', 'shadow-lg');
+                nav.classList.remove('bg-opacity-60');
+            } else {
+                nav.classList.remove('bg-opacity-90', 'shadow-lg');
+                nav.classList.add('bg-opacity-60');
+            }
+        });
+
+        const revealElements = document.querySelectorAll('.reveal');
+        const revealOptions = { threshold: 0.1, rootMargin: "0px 0px -50px 0px" };
+        
+        const revealObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, revealOptions);
+        
+        revealElements.forEach(el => revealObserver.observe(el));
+
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        const portfolioItems = document.querySelectorAll('.portfolio-item');
+
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterBtns.forEach(b => {
+                    b.classList.remove('bg-brand-warmgold', 'text-brand-obsidian', 'border-brand-warmgold');
+                    b.classList.add('bg-transparent', 'text-gray-300', 'border-gray-700');
+                });
+                
+                btn.classList.remove('bg-transparent', 'text-gray-300', 'border-gray-700');
+                btn.classList.add('bg-brand-warmgold', 'text-brand-obsidian', 'border-brand-warmgold');
+
+                const filterValue = btn.getAttribute('data-filter');
+
+                portfolioItems.forEach(item => {
+                    if (filterValue === 'all' || item.getAttribute('data-category') === filterValue) {
+                        item.style.display = 'block';
+                        setTimeout(() => {
+                            item.style.opacity = '1';
+                            item.style.transform = 'scale(1)';
+                        }, 50);
+                    } else {
+                        item.style.opacity = '0';
+                        item.style.transform = 'scale(0.9)';
+                        setTimeout(() => {
+                            item.style.display = 'none';
+                        }, 400);
+                    }
+                });
+            });
+        });
+
+        function handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.querySelector('.absolute.inset-0.w-full.h-full.object-cover.z-20');
+                    const placeholder = document.getElementById('profile-placeholder');
+                    const overlay = document.getElementById('profile-overlay');
+                    
+                    if(preview) {
+                        preview.src = e.target.result;
+                        preview.classList.remove('hidden');
+                    }
+                    if(placeholder) {
+                        placeholder.style.opacity = '0';
+                        setTimeout(() => placeholder.classList.add('hidden'), 300);
+                    }
+                    if(overlay) {
+                        overlay.classList.remove('hidden');
+                        overlay.classList.add('flex');
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        const tiltCard = document.getElementById('hero-card');
+        if (tiltCard) {
+            tiltCard.addEventListener('mousemove', (e) => {
+                const rect = tiltCard.getBoundingClientRect();
+                const x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+                const y = ((e.clientY - rect.top) / rect.height) * 2 - 1;
+                
+                const rotateX = y * -15; 
+                const rotateY = x * 15;
+                
+                tiltCard.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+            });
+
+            tiltCard.addEventListener('mouseleave', () => {
+                tiltCard.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
+                tiltCard.style.transition = 'transform 0.5s ease-out';
+            });
+
+            tiltCard.addEventListener('mouseenter', () => {
+                tiltCard.style.transition = 'none';
+            });
+        }
+
+        let ticking = false;
+        window.addEventListener('mousemove', (e) => {
+            if (!ticking) {
+                requestAnimationFrame(() => {
+                    const x = (e.clientX / window.innerWidth - 0.5) * 2;
+                    const y = (e.clientY / window.innerHeight - 0.5) * 2;
+                    document.documentElement.style.setProperty('--mouse-x', x);
+                    document.documentElement.style.setProperty('--mouse-y', y);
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        });
+
+        window.addEventListener('scroll', () => {
+            document.documentElement.style.setProperty('--scroll-y', window.scrollY);
+        }, { passive: true });
+
+        const canvas = document.getElementById('particleCanvas');
+        if (canvas) {
+            const ctx = canvas.getContext('2d');
+            let particles = [];
+
+            function resizeCanvas() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            window.addEventListener('resize', resizeCanvas);
+            resizeCanvas();
+
+            class Particle {
+                constructor() {
+                    this.z = Math.random() * 3 + 1; 
+                    this.x = Math.random() * canvas.width;
+                    this.y = Math.random() * canvas.height;
+                    
+                    this.baseSize = Math.random() * 2.5 + 0.5;
+                    this.size = this.baseSize / this.z;
+                    
+                    const speedMultiplier = window.innerWidth < 768 ? 0.3 : 0.5;
+                    this.speedX = (Math.random() * speedMultiplier - (speedMultiplier/2)) / this.z;
+                    this.speedY = (Math.random() * speedMultiplier - (speedMultiplier/2)) / this.z;
+                    
+                    const colors = [
+                        { r: 217, g: 119, b: 6 },
+                        { r: 245, g: 158, b: 11 },
+                        { r: 6, g: 78, b: 59 }
+                    ];
+                    this.colorObj = colors[Math.floor(Math.random() * colors.length)];
+                }
+                
+                update() {
+                    this.x += this.speedX;
+                    this.y += this.speedY;
+                    
+                    if (this.x < -50) this.x = canvas.width + 50;
+                    if (this.x > canvas.width + 50) this.x = -50;
+                    if (this.y < -50) this.y = canvas.height + 50;
+                    if (this.y > canvas.height + 50) this.y = -50;
+                }
+                
+                draw() {
+                    const opacity = Math.min(0.8, 1.2 / this.z);
+                    const colorStr = `rgba(${this.colorObj.r}, ${this.colorObj.g}, ${this.colorObj.b}, ${opacity})`;
+                    
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.fillStyle = colorStr;
+                    ctx.shadowBlur = 12 / this.z;
+                    ctx.shadowColor = `rgba(${this.colorObj.r}, ${this.colorObj.g}, ${this.colorObj.b}, 1)`;
+                    ctx.fill();
+                }
+            }
+
+            function initParticles() {
+                particles = [];
+                const count = window.innerWidth < 768 ? 40 : 85;
+                for (let i = 0; i < count; i++) {
+                    particles.push(new Particle());
+                }
+            }
+
+            function animateParticles() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                const maxDistance = 140;
+                for(let i = 0; i < particles.length; i++) {
+                    for(let j = i + 1; j < particles.length; j++) {
+                        const dx = particles[i].x - particles[j].x;
+                        const dy = particles[i].y - particles[j].y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+                        const zDiff = Math.abs(particles[i].z - particles[j].z);
+                        
+                        if (distance < maxDistance && zDiff < 1.0) {
+                            const opacity = 0.18 * (1 - distance / maxDistance);
+                            ctx.beginPath();
+                            ctx.strokeStyle = `rgba(217, 119, 6, ${opacity})`;
+                            ctx.lineWidth = 0.7 / Math.min(particles[i].z, particles[j].z);
+                            ctx.moveTo(particles[i].x, particles[i].y);
+                            ctx.lineTo(particles[j].x, particles[j].y);
+                            ctx.stroke();
+                        }
+                    }
+                }
+                
+                particles.forEach(p => {
+                    p.update();
+                    p.draw();
+                });
+                
+                requestAnimationFrame(animateParticles);
+            }
+
+            initParticles();
+            animateParticles();
+            
+            window.addEventListener('resize', () => {
+                setTimeout(initParticles, 200);
+            });
+        }
+    </script>
+</body>
+</html>
